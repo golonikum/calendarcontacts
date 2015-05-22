@@ -1,5 +1,6 @@
 var moment = require('moment');
 var fs = require('fs');
+var path = require('path');
 var auth = require('./auth');
 var model = require('./model');
 
@@ -26,13 +27,14 @@ module.exports = {
         });
 
         app.post('/load', auth.restrict, function(req, res){
-            var filePath = __dirname + '/data/persons.json';
+            var filePath = path.normalize(__dirname + '/../data/persons.json'),
+                uploadPath = path.normalize(__dirname + '/../' + req.files.persons.path);
             // backup file
             if ( fs.existsSync(filePath) ) {
                 fs.renameSync(filePath, filePath + moment().format('.YYYYMMDDHHmmss') + '.bak');
             }
             // write file
-            fs.readFile(req.files.persons.path, function (err, data) {
+            fs.readFile(uploadPath, function (err, data) {
                 fs.writeFile(filePath, data, function (err) {
                     res.redirect('/main');
                 });
