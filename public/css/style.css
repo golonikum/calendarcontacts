@@ -1,0 +1,35 @@
+body {
+	font-family: Verdana,Tahoma,Helvetica,Arial,sans-serif;
+}
+
+.typo {
+	padding-right: 8px;
+}
+
+.typo2 {
+	padding-right: 4px;
+}
+
+li.society {
+	background-color: #E2EEF7;
+}
+
+div.address-block {
+	margin-top: 15px;
+}
+
+#inline-btn {
+    margin-left: 8px;
+}
+
+.right-align {
+    text-align: right;
+}
+
+a i.fa {
+    margin-right: 5px;
+}
+
+li.today {
+    color: red;
+}

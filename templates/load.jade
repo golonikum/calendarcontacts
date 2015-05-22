@@ -1,0 +1,10 @@
+extends ./base_other.jade
+
+block content
+    div(class="panel-body")
+        form(method="post", action="/load", class="form-inline", enctype="multipart/form-data")
+            div(class="form-group")
+                input(type="file", class="form-control", name="persons")
+            button(type="submit", class="btn btn-primary", id="inline-btn")
+                i(class="fa fa-upload")
+                | &nbsp;Загрузить

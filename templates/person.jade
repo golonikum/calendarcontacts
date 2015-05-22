@@ -1,0 +1,89 @@
+extends ./base_other.jade
+
+mixin field(name, label, value, textarea)
+    div(class="form-group")
+        label(class="col-sm-4 control-label", for="#{name}") #{label}
+        div(class="col-sm-8")
+            if textarea
+                textarea(class="form-control", name="#{name}", placeholder="#{label}") #{value || ''}
+            else
+                input(type="text", class="form-control", name="#{name}", placeholder="#{label}", value="#{value || ''}")
+
+mixin eventField(name, value)
+    div(class="form-group event-group")
+        div(class="col-sm-1")
+        div(class="col-sm-6")
+            input(type="text", class="form-control right-align", placeholder="Событие", value="#{name || ''}")
+        div(class="col-sm-3")
+            input(type="text", class="form-control", placeholder="ДД.ММ(.ГГГГ)", value="#{value || ''}")
+        div(class="col-sm-2")
+            button(type="button", class="btn btn-danger", title="Удалить событие")
+                i(class="fa fa-minus-circle")
+
+mixin phonesField(value)
+    div(class="form-group")
+        label(class="col-sm-4 control-label", for="phones") Телефоны
+        div(class="col-sm-8")
+            input(type="text", class="form-control", name="phones", placeholder="Телефоны через запятую", value="#{value || ''}")
+
+mixin emailsField(value)
+    div(class="form-group")
+        label(class="col-sm-4 control-label", for="emails") E-mails
+        div(class="col-sm-8")
+            input(type="text", class="form-control", name="emails", placeholder="E-mails через запятую", value="#{value || ''}")
+
+mixin modal
+    div(class="modal fade", id="modal-remove-person")
+        div(class="modal-dialog modal-sm")
+            div(class="modal-content")
+                div(class="modal-header")
+                    button(type="button", class="close", data-dismiss="modal", aria-label="Close")
+                        span(aria-hidden="true") &times;
+                    h4(class="modal-title") Удаление информации
+                div(class="modal-body")
+                    p.
+                        Вы действительно хотите удалить информацию?
+                div(class="modal-footer")
+                    button(type="button", class="btn btn-default", data-dismiss="modal") Закрыть
+                    button(type="button", class="btn btn-primary", id="real-remove-person") Удалить
+
+block content
+    +modal
+    div(class="panel-body")
+        if error
+            p(class="text-danger") #{error}
+        else
+            form(class="form-horizontal", method="POST", action="/person#{id ? '?id='+id : ''}", role="form", id="person-form")
+                h3 Основное
+                +field('lastname', 'Фамилия', person && person['фио'] && person['фио']['фамилия'])
+                +field('firstname', 'Имя', person && person['фио'] && person['фио']['имя'])
+                +field('middlename', 'Отчество (Сан)', person && person['фио'] && ( person['фио']['сан'] || person['фио']['отчество'] ))
+                +field('address', 'Адрес', person && person['адрес'], true)
+                +field('group', 'Категория', person && person['группа'])
+
+                h3 События
+                if person
+                    each value, name in person['события']
+                        +eventField(name, value)
+                div(class="form-group")
+                    div(class="col-sm-10")
+                    div(class="col-sm-2")
+                        button(type="button", class="btn btn-success", title="Добавить событие", id="add-event")
+                            i(class="fa fa-plus-circle")
+
+                h3 Контакты
+                if person && person['контакты']
+                    +phonesField(person['контакты']['телефоны'])
+                    +emailsField(person['контакты']['e-mails'])
+                else
+                    +phonesField('')
+                    +emailsField('')
+
+                button(type="submit", class="btn btn-primary", id="save-person")
+                    i(class="fa fa-save")
+                    | &#160;Сохранить
+
+                if id
+                    a(class="btn btn-danger", id="remove-person", style="margin-left:5px")
+                        i(class="fa fa-trash")
+                        | Удалить

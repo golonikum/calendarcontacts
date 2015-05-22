@@ -1,0 +1,15 @@
+extends ./base_other.jade
+
+block content
+    div(class="panel-body")
+        form(method="POST", action="/search", class="form-inline", role="form")
+            div(class="form-group")
+                input(type="text", class="form-control", name="fio")
+            button(type="submit", class="btn btn-primary", id="inline-btn")
+                i(class="fa fa-search")
+                | &nbsp;Искать
+    if persons
+        ul(class="list-group")
+            each val, index in persons
+                li(class="list-group-item")
+                    a(href="/person?id=#{val.id}") #{val.fullName}
