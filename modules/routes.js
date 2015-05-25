@@ -1,6 +1,7 @@
 var moment = require('moment');
 var fs = require('fs');
 var path = require('path');
+var mime = require('mime');
 var auth = require('./auth');
 var model = require('./model');
 
@@ -84,6 +85,17 @@ module.exports = {
                 model.removePerson(id);
             }
             res.redirect('/main');
+        });
+
+        app.get('/download', auth.restrict, function(req, res){
+            var file = __dirname + '/../data/persons.json',
+                filename = path.basename(file),
+                mimetype = mime.lookup(file);
+
+            res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+            res.setHeader('Content-type', mimetype);
+
+            fs.createReadStream(file).pipe(res);
         });
     }
 };
