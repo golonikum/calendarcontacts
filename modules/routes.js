@@ -16,13 +16,23 @@ module.exports = {
 
         app.get('/nearest', auth.restrict, function(req, res) {
             model.getAllSortedEvents(true, function(err, events) {
-                res.render('events', {title: 'Ближайшие события: ' + moment().format('DD.MM.YYYY'), events: events});
+                if ( err ) {
+                    console.error(err);
+                    res.status(500).end();
+                } else {
+                    res.render('events', {title: 'Ближайшие события: ' + moment().format('DD.MM.YYYY'), events: events});
+                }
             });
         });
 
         app.get('/all', auth.restrict, function(req, res){
             model.getAllSortedEvents(false, function(err, events) {
-                res.render('events', {title: 'Все события', events: events});
+                if ( err ) {
+                    console.error(err);
+                    res.status(500).end();
+                } else {
+                    res.render('events', {title: 'Все события', events: events});
+                }
             });
         });
 
