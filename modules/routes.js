@@ -1,7 +1,6 @@
 var moment = require('moment');
 var fs = require('fs');
 var path = require('path');
-var mime = require('mime');
 var auth = require('./auth');
 var model = require('./model');
 
@@ -15,12 +14,16 @@ module.exports = {
             res.render('main', {title: 'Главная'});
         });
 
-        app.get('/nearest', auth.restrict, function(req, res){
-            res.render('events', {title: 'Ближайшие события: ' + moment().format('DD.MM.YYYY'), events: model.getAllSortedEvents(true)});
+        app.get('/nearest', auth.restrict, function(req, res) {
+            model.getAllSortedEvents(true, function(err, events) {
+                res.render('events', {title: 'Ближайшие события: ' + moment().format('DD.MM.YYYY'), events: events});
+            });
         });
 
         app.get('/all', auth.restrict, function(req, res){
-            res.render('events', {title: 'Все события', events: model.getAllSortedEvents()});
+            model.getAllSortedEvents(false, function(err, events) {
+                res.render('events', {title: 'Все события', events: events});
+            });
         });
 
         app.get('/load', auth.restrict, function(req, res){
@@ -28,17 +31,8 @@ module.exports = {
         });
 
         app.post('/load', auth.restrict, function(req, res){
-            var filePath = path.normalize(__dirname + '/../data/persons.json'),
-                uploadPath = path.normalize(__dirname + '/../' + req.files.persons.path);
-            // backup file
-            if ( fs.existsSync(filePath) ) {
-                fs.renameSync(filePath, filePath + moment().format('.YYYYMMDDHHmmss') + '.bak');
-            }
-            // write file
-            fs.readFile(uploadPath, function (err, data) {
-                fs.writeFile(filePath, data, function (err) {
-                    res.redirect('/main');
-                });
+            model.uploadPesronsFile(req.files.persons.path, function(err) {
+                res.redirect('/main');
             });
         });
 
@@ -88,14 +82,7 @@ module.exports = {
         });
 
         app.get('/download', auth.restrict, function(req, res){
-            var file = __dirname + '/../data/persons.json',
-                filename = path.basename(file),
-                mimetype = mime.lookup(file);
-
-            res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-            res.setHeader('Content-type', mimetype);
-
-            fs.createReadStream(file).pipe(res);
+            model.sendPersonsFile(res);
         });
     }
 };

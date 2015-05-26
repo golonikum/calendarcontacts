@@ -1,5 +1,8 @@
 var fs = require('fs');
 var moment = require('moment');
+var mime = require('mime');
+var path = require('path');
+var postgres = require('./postgres');
 var beautify = require('js-beautify').js_beautify;
 var S = require('string');
 
@@ -9,6 +12,30 @@ var eventsFile = './data/events.json',
     persons = null;
 
 
+/**
+ * Use environment var PRODUCTION.
+ * For Heroku it is set to '1', and use PostgresQL for serving persons file.
+ * For development we use filesystem.
+ */
+
+
+
+
+function getPersonsObj( cb ) {
+    if ( process.env.PRODUCTION ) {
+        postgres.getPersonsJson(cb);
+    } else {
+        cb( null, readJson(personsFile) );
+    }
+}
+
+function setPersonsObj() {
+    if (process.env.PRODUCTION) {
+
+    } else {
+        writeJson(persons, personsFile);
+    }
+}
 
 function readJson( file ) {
     return JSON.parse( fs.readFileSync(file, {encoding: 'utf8'}) );
@@ -68,8 +95,8 @@ function getFullName( fio ) {
 }
 
 function isToday( strDate ) {
-    var today = moment().format( strDate.length == 10 ? 'DD.MM.YYYY' : 'DD.MM' );
-    return strDate === today;
+    var today = moment().format( 'DD.MM' );
+    return ( strDate.substr(0, 5) === today );
 }
 
 function isMiddlename( str ) {
@@ -105,71 +132,76 @@ function convertPerson( body ) {
 
 
 module.exports = {
-    getAllSortedEvents: function( nearest ) {
+    getAllSortedEvents: function( nearest, cb ) {
         events = readJson( eventsFile );
-        persons = readJson( personsFile );
+        getPersonsObj(function(err, persons) {
+            if (err) {
+                cb(err);
+            } else {
+                var all = [];
 
-        var all = [];
+                for (var host in events) {
+                    for (var event in events[host]) {
+                        var date = events[host][event],
+                            curYear = (new Date()).getFullYear(),
+                            year = ( date.substr(6, 4) || curYear ),
+                            age = curYear - year;
 
-        for (var host in events) {
-            for (var event in events[host]) {
-                var date = events[host][event],
-                    curYear = (new Date()).getFullYear(),
-                    year = ( date.substr(6, 4) || curYear ),
-                    age = curYear - year;
+                        all.push({
+                            isPerson: false,
+                            date: date,
+                            event: event + getAge(date),
+                            host: host,
+                            today: isToday(date)
+                        });
+                    }
+                }
 
-                all.push({
-                    isPerson: false,
-                    date: date,
-                    event: event + getAge(date),
-                    host: host,
-                    today: isToday(date)
+                for (var id in persons) {
+                    var person = persons[id],
+                        fio = person['фио'];
+
+                    for (var event in person['события']) {
+                        var date = person['события'][event];
+                        all.push({
+                            id: id,
+                            isPerson: true,
+                            date: date,
+                            event: event + getAge(date),
+                            host: getFullName(fio),
+                            today: isToday(date)
+                        });
+                    }
+                }
+
+                all.sort(function(a, b){
+                    var d1 = getComparableDate(a),
+                        d2 = getComparableDate(b);
+                    if (d1 > d2) return 1;
+                    else if (d1 < d2) return -1;
+                    else return 0;
                 });
+
+                if (nearest) {
+                    var start = moment().format('MMDD');
+                    end = moment().add(2, 'M').format('MMDD');
+
+                    all = all.filter(function(event){
+                        var date = getComparableDate( event );
+                        return ( start <= date && date < end );
+                    });
+                }
+
+                cb(null, all);
             }
-        }
-
-        for (var id in persons) {
-            var person = persons[id],
-                fio = person['фио'];
-
-            for (var event in person['события']) {
-                var date = person['события'][event];
-                all.push({
-                    id: id,
-                    isPerson: true,
-                    date: date,
-                    event: event + getAge(date),
-                    host: getFullName(fio),
-                    today: isToday(date)
-                });
-            }
-        }
-
-        all.sort(function(a, b){
-            var d1 = getComparableDate(a),
-                d2 = getComparableDate(b);
-            if (d1 > d2) return 1;
-            else if (d1 < d2) return -1;
-            else return 0;
         });
 
-        if (nearest) {
-            var start = moment().format('MMDD');
-                end = moment().add(2, 'M').format('MMDD');
-
-            all = all.filter(function(event){
-                var date = getComparableDate( event );
-                return ( start <= date && date < end );
-            });
-        }
-
-        return all;
     },
 
     findPersons: function( searchText ) {
         var found = [];
 
-        persons = readJson( personsFile );
+        persons = getPersonsObj();
 
         for (var id in persons) {
             var person = persons[id],
@@ -188,19 +220,43 @@ module.exports = {
     },
 
     getPerson: function( id ) {
-        persons = readJson( personsFile );
+        persons = getPersonsObj();
         return persons[ id ];
     },
 
     updatePerson: function( id, body ) {
-        persons = readJson( personsFile );
+        persons = getPersonsObj();
         persons[ id ] = convertPerson(body);
-        writeJson(persons, personsFile);
+        setPersonsObj();
     },
 
     removePerson: function( id ) {
-        persons = readJson( personsFile );
+        persons = getPersonsObj();
         delete persons[ id ];
-        writeJson(persons, personsFile);
+        setPersonsObj();
+    },
+
+    sendPersonsFile: function(res) {
+        var file = __dirname + '/../data/persons.json',
+            filename = path.basename(file),
+            mimetype = mime.lookup(file);
+
+        res.setHeader('Content-disposition', 'attachment; filename=' + moment().format('YYYY-MM-DD.') + filename);
+        res.setHeader('Content-type', mimetype);
+
+        fs.createReadStream(file).pipe(res);
+    },
+
+    uploadPesronsFile: function(file, cb) {
+        var filePath = path.normalize(__dirname + '/../data/persons.json'),
+            uploadPath = path.normalize(__dirname + '/../' + file);
+        // backup file
+        if ( fs.existsSync(filePath) ) {
+            fs.renameSync(filePath, filePath + moment().format('.YYYYMMDDHHmmss') + '.bak');
+        }
+        // write file
+        fs.readFile(uploadPath, function (err, data) {
+            fs.writeFile(filePath, data, cb);
+        });
     }
 };

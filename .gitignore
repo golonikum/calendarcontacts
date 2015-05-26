@@ -29,3 +29,5 @@ node_modules
 uploads/*
 
 .idea
+
+data/persons.json*
