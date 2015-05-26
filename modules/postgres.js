@@ -1,5 +1,7 @@
 var pg = require('pg');
-var connectionString = "postgres://pdspldcntxttnp:dMcgXepP3ToNhf7K-AuwvA_Md-@ec2-50-19-233-111.compute-1.amazonaws.com:5432/de9sjuieikqj6k";
+var connectionString = process.env.PRODUCTION
+    ? 'postgres://pdspldcntxttnp:dMcgXepP3ToNhf7K-AuwvA_Md-@ec2-50-19-233-111.compute-1.amazonaws.com:5432/de9sjuieikqj6k'
+    : 'postgres://postgres:12qw34er56ty@localhost:5432/postgres';
 
 function createClient() {
     return new pg.Client(connectionString);
@@ -18,7 +20,7 @@ function createTableIf(cb) {
                         client.end();
                         cb(err);
                     } else {
-                        client.query('INSERT INTO files(body) VALUES("{}")', function(err, result) {
+                        client.query('INSERT INTO files(body) VALUES($1)', ['{}'], function(err, result) {
                             if (err) {
                                 client.end();
                                 cb(err);
@@ -36,39 +38,55 @@ function createTableIf(cb) {
     });
 }
 
-function select(sql, cb) {
+function select( sql, pars, cb ) {
     var client = createClient();
+    var fn = function(err, result) {
+        if (err) {
+            cb(err);
+        } else {
+            client.end();
+            cb(null, result);
+        }
+    };
     client.connect(function(err) {
         if (err) {
             cb(err);
         }
-        client.query(sql, function(err, result) {
-            if (err) {
-                cb(err);
-            } else {
-                client.end();
-                cb(null, result);
-            }
-        });
+        client.query(sql, pars ? pars : fn, pars ? fn : undefined);
     });
 }
 
-
+function wrap( cb ) {
+    createTableIf(function(err){
+        if (err) {
+            cb(err);
+        } else {
+            cb();
+        }
+    });
+}
 
 module.exports = {
     getPersonsJson: function( cb ) {
-        createTableIf(function(err){
-            if (err) {
-                cb(err);
-            } else {
-                select( 'SELECT * FROM files', function(err, result) {
-                    if (err) {
-                        cb(err);
-                    } else {
-                        cb(null, JSON.parse(result.rows[0].body));
-                    }
-                } );
-            }
+        wrap(function(err) {
+            select( 'SELECT * FROM files', null, function(err, result) {
+                if (err) {
+                    cb(err);
+                } else {
+                    cb(null, JSON.parse(result.rows[0].body));
+                }
+            } );
+        });
+    },
+    setPersons: function( strPersons, cb ) {
+        wrap(function(err){
+            select( 'UPDATE files SET body = ($1)', [strPersons], function(err, result) {
+                if (err) {
+                    cb(err);
+                } else {
+                    cb();
+                }
+            } );
         });
     }
 };

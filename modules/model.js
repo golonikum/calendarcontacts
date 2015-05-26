@@ -1,48 +1,15 @@
 var fs = require('fs');
 var moment = require('moment');
-var mime = require('mime');
 var path = require('path');
 var postgres = require('./postgres');
-var beautify = require('js-beautify').js_beautify;
 var S = require('string');
 
 var eventsFile = './data/events.json',
-    personsFile = './data/persons.json',
-    events = null,
-    persons = null;
+    events = null;
 
-
-/**
- * Use environment var PRODUCTION.
- * For Heroku it is set to '1', and use PostgresQL for serving persons file.
- * For development we use filesystem.
- */
-
-
-
-
-function getPersonsObj( cb ) {
-    if ( process.env.PRODUCTION ) {
-        postgres.getPersonsJson(cb);
-    } else {
-        cb( null, readJson(personsFile) );
-    }
-}
-
-function setPersonsObj() {
-    if (process.env.PRODUCTION) {
-
-    } else {
-        writeJson(persons, personsFile);
-    }
-}
 
 function readJson( file ) {
     return JSON.parse( fs.readFileSync(file, {encoding: 'utf8'}) );
-}
-
-function writeJson( obj, file ) {
-    fs.writeFileSync(file, beautify( JSON.stringify(obj) ), {encoding: 'utf8'});
 }
 
 function getComparableDate( event ) {
@@ -134,7 +101,7 @@ function convertPerson( body ) {
 module.exports = {
     getAllSortedEvents: function( nearest, cb ) {
         events = readJson( eventsFile );
-        getPersonsObj(function(err, persons) {
+        postgres.getPersonsJson(function(err, persons) {
             if (err) {
                 cb(err);
             } else {
@@ -198,65 +165,80 @@ module.exports = {
 
     },
 
-    findPersons: function( searchText ) {
-        var found = [];
+    findPersons: function( searchText, cb ) {
+        postgres.getPersonsJson(function(err, persons) {
+            if (err) {
+                cb(err);
+            } else {
+                var found = [];
+                for (var id in persons) {
+                    var person = persons[id],
+                        fio = person['фио'],
+                        fullName = getFullName(fio);
 
-        persons = getPersonsObj();
-
-        for (var id in persons) {
-            var person = persons[id],
-                fio = person['фио'],
-                fullName = getFullName(fio);
-
-            if ( fullName.indexOf(searchText) != -1 ) {
-                found.push({
-                    id: id,
-                    fullName: fullName
-                });
+                    if ( fullName.indexOf(searchText) != -1 ) {
+                        found.push({
+                            id: id,
+                            fullName: fullName
+                        });
+                    }
+                }
+                cb(null, found);
             }
-        }
-
-        return found;
+        });
     },
 
-    getPerson: function( id ) {
-        persons = getPersonsObj();
-        return persons[ id ];
+    getPerson: function( id, cb ) {
+        postgres.getPersonsJson(function(err, persons){
+            if (err) {
+                cb(err);
+            } else {
+                cb(null, persons[ id ]);
+            }
+        });
     },
 
-    updatePerson: function( id, body ) {
-        persons = getPersonsObj();
-        persons[ id ] = convertPerson(body);
-        setPersonsObj();
+    updatePerson: function( id, body, cb ) {
+        postgres.getPersonsJson(function(err, persons){
+            if (err) {
+                cb(err);
+            } else {
+                persons[ id ] = convertPerson(body);
+                postgres.setPersons(JSON.stringify(persons), cb);
+            }
+        });
     },
 
-    removePerson: function( id ) {
-        persons = getPersonsObj();
-        delete persons[ id ];
-        setPersonsObj();
+    removePerson: function( id, cb ) {
+        postgres.getPersonsJson(function(err, persons){
+            if (err) {
+                cb(err);
+            } else {
+                delete persons[ id ];
+                postgres.setPersons(JSON.stringify(persons), cb);
+            }
+        });
     },
 
-    sendPersonsFile: function(res) {
-        var file = __dirname + '/../data/persons.json',
-            filename = path.basename(file),
-            mimetype = mime.lookup(file);
-
-        res.setHeader('Content-disposition', 'attachment; filename=' + moment().format('YYYY-MM-DD.') + filename);
-        res.setHeader('Content-type', mimetype);
-
-        fs.createReadStream(file).pipe(res);
+    getAllPersons: function(cb) {
+        postgres.getPersonsJson(function(err, persons){
+            if (err) {
+                cb(err);
+            } else {
+                cb(null, persons);
+            }
+        });
     },
 
     uploadPesronsFile: function(file, cb) {
         var filePath = path.normalize(__dirname + '/../data/persons.json'),
             uploadPath = path.normalize(__dirname + '/../' + file);
-        // backup file
-        if ( fs.existsSync(filePath) ) {
-            fs.renameSync(filePath, filePath + moment().format('.YYYYMMDDHHmmss') + '.bak');
-        }
-        // write file
         fs.readFile(uploadPath, function (err, data) {
-            fs.writeFile(filePath, data, cb);
+            if (err) {
+                cb(err);
+            } else {
+                postgres.setPersons( data.toString(), cb );
+            }
         });
     }
 };
