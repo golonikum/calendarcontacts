@@ -2,6 +2,8 @@ var express = require('express');
 var path = require('path');
 var multer = require('multer');
 var bodyParser = require('body-parser');
+var winston = require('winston');
+var expressWinston = require('express-winston');
 var auth = require('./modules/auth');
 var routes = require('./modules/routes');
 var app = express();
@@ -16,17 +18,31 @@ app.use( express.static( path.join(__dirname, 'public') ) );
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({dest: './uploads/'}));
 
+// express-winston logger makes sense BEFORE the router
+app.use(expressWinston.logger({
+    transports: [
+        new winston.transports.Console({
+            json: true,
+            colorize: true
+        })
+    ]
+}));
+
 // auth
 auth.init( app );
 
 // routes
 routes.init( app );
 
-//error handling
-/*app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});*/
+// express-winston errorLogger makes sense AFTER the router
+app.use(expressWinston.errorLogger({
+    transports: [
+        new winston.transports.Console({
+            json: true,
+            colorize: true
+        })
+    ]
+}));
 
 // run
 app.listen(port, function() {
