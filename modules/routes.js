@@ -2,11 +2,12 @@ var moment = require('moment');
 var beautify = require('js-beautify').js_beautify;
 var auth = require('./auth');
 var model = require('./model');
+var logger = require('./logger').logger;
 
 function errorWrapper(res, cb) {
     return function(err, arg) {
         if ( err ) {
-            console.error(err);
+            logger.fatal(err);
             res.status(500).end();
         } else {
             cb.call(this, arg);

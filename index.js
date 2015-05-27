@@ -2,10 +2,9 @@ var express = require('express');
 var path = require('path');
 var multer = require('multer');
 var bodyParser = require('body-parser');
-var winston = require('winston');
-var expressWinston = require('express-winston');
 var auth = require('./modules/auth');
 var routes = require('./modules/routes');
+var logger = require('./modules/logger');
 var app = express();
 var port = Number(process.env.PORT || 3001);
 
@@ -19,14 +18,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({dest: './uploads/'}));
 
 // express-winston logger makes sense BEFORE the router
-app.use(expressWinston.logger({
-    transports: [
-        new winston.transports.Console({
-            json: true,
-            colorize: true
-        })
-    ]
-}));
+app.use(logger.requestLogger);
 
 // auth
 auth.init( app );
@@ -35,14 +27,7 @@ auth.init( app );
 routes.init( app );
 
 // express-winston errorLogger makes sense AFTER the router
-app.use(expressWinston.errorLogger({
-    transports: [
-        new winston.transports.Console({
-            json: true,
-            colorize: true
-        })
-    ]
-}));
+app.use(logger.errorLogger);
 
 // run
 app.listen(port, function() {
