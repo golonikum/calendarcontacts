@@ -4,9 +4,6 @@ var path = require('path');
 var postgres = require('./postgres');
 var S = require('string');
 
-var eventsFile = './data/events.json',
-    events = null;
-
 
 function readJson( file ) {
     return JSON.parse( fs.readFileSync(file, {encoding: 'utf8'}) );
@@ -100,7 +97,7 @@ function convertPerson( body ) {
 
 module.exports = {
     getAllSortedEvents: function( nearest, cb ) {
-        events = readJson( eventsFile );
+        var events = readJson( './data/events.json' );
         postgres.getPersonsJson(function(err, persons) {
             if (err) {
                 cb(err);

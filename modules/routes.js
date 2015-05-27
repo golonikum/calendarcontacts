@@ -47,12 +47,12 @@ module.exports = {
         });
 
         app.get('/search', auth.restrict, function(req, res){
-            res.render('search', {title: 'Информация о людях'});
+            res.render('search', {title: 'Информация о людях', fio: ''});
         });
 
         app.post('/search', auth.restrict, function(req, res){
             model.findPersons(req.body.fio, errorWrapper(res, function(persons) {
-                res.render('search', {title: 'Информация о людях (' + persons.length + ')', persons: persons});
+                res.render('search', {title: 'Информация о людях (найдено ' + persons.length + ')', persons: persons, fio: req.body.fio});
             }));
         });
 

@@ -4,7 +4,7 @@ block content
     div(class="panel-body")
         form(method="POST", action="/search", class="form-inline", role="form")
             div(class="form-group")
-                input(type="text", class="form-control", name="fio")
+                input(type="text", class="form-control", name="fio", value="#{fio}")
             button(type="submit", class="btn btn-primary", id="inline-btn")
                 i(class="fa fa-search")
                 | &nbsp;Искать

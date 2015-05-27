@@ -2,7 +2,7 @@ extends ./base_other.jade
 
 block content
     div(class="panel-body")
-        form(method="post", action="/load", class="form-inline", enctype="multipart/form-data")
+        form(method="post", action="/load", class="form-inline", enctype="multipart/form-data", id="upload-form")
             div(class="form-group")
                 input(type="file", class="form-control", name="persons")
             button(type="submit", class="btn btn-primary", id="inline-btn")

@@ -1,3 +1,9 @@
+function validateField( form, name ) {
+    var field = $(form).find('input[name=' + name + ']');
+    field.parents('.form-group')[field.val() == '' ? 'addClass' : 'removeClass']('has-error');
+    return !!field.val();
+}
+
 $(function(){
     $('body').on('click', 'div.event-group button.btn-danger', function() {
         $(this).parents('div.event-group').remove();
@@ -15,12 +21,20 @@ $(function(){
                 '</div>' +
                 '<div class="col-sm-2">' +
                     '<button type="button" class="btn btn-danger" title="Удалить событие">' +
-                        '<i class="fa fa-minus-circle fa-lg"></i>' +
+                        '<i class="fa fa-minus-circle"></i>' +
                     '</button>' +
                 '</div>' +
             '</div>'
         );
     });
+
+    /* persons form */
+
+    function isPersonValid(form) {
+        var f1 = validateField(form, 'lastname'),
+            f2 = validateField(form, 'firstname');
+        return f1 && f2;
+    }
 
     $("#person-form").submit(function(e) {
         e.preventDefault();
@@ -30,7 +44,9 @@ $(function(){
             $(this).find('.col-sm-3 input').attr('name', 'eventvalue' + i);
             i++;
         });
-        this.submit();
+        if ( isPersonValid(this) ) {
+            this.submit();
+        }
         return false;
     });
 
@@ -41,4 +57,15 @@ $(function(){
     $('body').on('click', '#real-remove-person', function() {
         location.href = '/remove-person?id=' + location.href.replace(/^.+\?id=(\d+)$/, '$1');
     });
+
+    /* upload form */
+
+    $("#upload-form").submit(function(e) {
+        e.preventDefault();
+        if ( validateField(this, 'persons') ) {
+            this.submit();
+        }
+        return false;
+    });
+
 });
