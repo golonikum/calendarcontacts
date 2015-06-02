@@ -130,7 +130,7 @@ module.exports = {
                         all.push({
                             id: id,
                             isPerson: true,
-                            date: date,
+                            date: date.substr(0,5),
                             event: event + getAge(date),
                             host: getFullName(fio),
                             today: isToday(date)
