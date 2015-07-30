@@ -50,6 +50,23 @@ function getRussianAge( age ) {
     return getCounterRussian( age, ['год', 'года', 'лет'] );
 }
 
+function getDayOfWeek( strDate ) {
+    return moment( strDate.substr(0, 5) + '.' + (new Date()).getFullYear(), 'DD.MM.YYYY' ).weekday();
+}
+
+function getRussianDayOfWeek( strDate ) {
+    var names = {
+        '1': 'ПН',
+        '2': 'ВТ',
+        '3': 'СР',
+        '4': 'ЧТ',
+        '5': 'ПТ',
+        '6': 'СБ',
+        '0': 'ВС'
+    };
+    return names[ getDayOfWeek( strDate ) ];
+}
+
 function getFullName( fio ) {
     if ( fio['сан'] ) {
         return fio['сан'] + ' ' +  fio['имя'] + ' (' + fio['фамилия'] + ')';
@@ -115,8 +132,10 @@ module.exports = {
                             isPerson: false,
                             date: date.substr(0,5),
                             event: event + getAge(date),
-                            host: host,
-                            today: isToday(date)
+                            host: host.replace(/#.{6}/, ''),
+                            today: isToday(date),
+                            color: host.replace(/^.+(#.{6})$/, '$1'),
+                            dayOfWeek: getRussianDayOfWeek( date )
                         });
                     }
                 }
@@ -133,7 +152,8 @@ module.exports = {
                             date: date.substr(0,5),
                             event: event + getAge(date),
                             host: getFullName(fio),
-                            today: isToday(date)
+                            today: isToday(date),
+                            dayOfWeek: getRussianDayOfWeek( date )
                         });
                     }
                 }

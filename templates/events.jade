@@ -5,12 +5,12 @@ block content
         each val, index in events
             if val.isPerson
                 li(class="list-group-item#{val.today ? ' today' : ''}", data-id="#{val.id}")
-                    span(class="typo") #{val.date}
+                    span(class="typo monospace") #{val.date} #{val.dayOfWeek}
                     span(class="typo") #{val.event}
                     span(class="typo")
                         a(href="/person?id=#{val.id}") #{val.host}
             else
-                li(class="list-group-item society#{val.today ? ' today' : ''}")
-                    span(class="typo") #{val.date}
+                li(class="list-group-item society#{val.today ? ' today' : ''}", style="background-color:#{val.color || 'white'}")
+                    span(class="typo monospace") #{val.date} #{val.dayOfWeek}
                     b(class="typo") #{val.event}
                     span(class="typo") #{val.host}

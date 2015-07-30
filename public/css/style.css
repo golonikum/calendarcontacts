@@ -10,6 +10,10 @@ body {
 	padding-right: 4px;
 }
 
+.monospace {
+    font-family: "courier new", monospace;
+}
+
 li.society {
 	background-color: #E2EEF7;
 }
