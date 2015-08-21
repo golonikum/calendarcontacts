@@ -105,36 +105,16 @@ module.exports = {
         });
 
         app.get('/email', auth.restrict, function(req, res){
-            var sparkpost = require('sparkpost');
-
-            var client = new sparkpost(); // uses process.env.SPARKPOST_API_KEY
-            var from = 'test@' + process.env.SPARKPOST_SANDBOX_DOMAIN; // 'test@sparkpostbox.com'
-
-            var txObject = {
-                campaign: 'first-mailing',
-                from: from,
-                subject: 'Hello from node-sparkpost',
-                html: '<p>Hello world</p>',
-                text: 'Hello world',
-                substitutionData: {
-
-                },
-                recipients: [
-                    'goloniko@gmail.com'
-                ]
-            };
-
-            var txResponseHandler = function txResponseHandler(err, data) {
-                if (err) {
-                    console.error('ERROR: ', err);
-                    new Error(err);
-                } else {
-                    console.log('WOOHOO, Transmission accepted by SparkPost!');
-                    console.log(data);
-                }
-            };
-
-            client.transmissions.send(txObject, txResponseHandler);
+            var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+            sendgrid.send({
+                to:       'goloniko@gmail.com',
+                from:     'other@example.com',
+                subject:  'Hello World',
+                text:     'My first email through SendGrid.'
+            }, function(err, json) {
+                if (err) { return console.error(err); }
+                console.log(json);
+            });
         });
 
     }
