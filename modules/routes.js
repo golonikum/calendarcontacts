@@ -113,7 +113,7 @@ module.exports = {
                 text:     'My first email through SendGrid.'
             }, function(err, json) {
                 if (err) { return console.error(err); }
-                console.log(json);
+                res.redirect('/main');
             });
         });
 
