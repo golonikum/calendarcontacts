@@ -29,7 +29,7 @@ model.getAllSortedEvents(true, function( err, events ) {
     sendgrid.send({
         to: 'goloniko@gmail.com',
         from: 'contacts2@golonikum.net',
-        subject: '[CONTACTS2] Ближайшие события',
+        subject: '🎂 Ближайшие события',
         html: html
     }, function(err, json) {
         if (err) { return console.error(err); }
