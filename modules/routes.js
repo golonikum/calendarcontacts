@@ -104,19 +104,6 @@ module.exports = {
             }));
         });
 
-        app.get('/email', auth.restrict, function(req, res){
-            var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
-            sendgrid.send({
-                to:       'goloniko@gmail.com',
-                from:     'other@example.com',
-                subject:  'Hello World',
-                text:     'My first email through SendGrid.'
-            }, function(err, json) {
-                if (err) { return console.error(err); }
-                res.redirect('/main');
-            });
-        });
-
     }
 };
 
