@@ -11,12 +11,12 @@ model.getAllSortedEvents(true, function( err, events ) {
         return day.isBefore( plusWeek );
     } );
 
-    var html = '<ul>';
+    var html = '<ul style="font-size:16px;">';
     events.forEach(function( e ) {
-        var red = ( todayStr === e.date ? ' style="color:red"' : '' ),
+        var red = ( todayStr === e.date ? 'color:red;' : '' ),
             bold = ' style="font-weight:bold"';
         html += format(
-            '<li{0}><span>{1} {2}</span>&nbsp;<span{3}>{4}</span>&nbsp;<span{5}>{6}</span></li>',
+            '<li style="line-height:25px;{0}"><span>{1} {2}</span>&nbsp;<span{3}>{4}</span>&nbsp;<span{5}>{6}</span></li>',
             red,
             e.date, e.dayOfWeek,
             e.isPerson ? '' : bold, e.event,
