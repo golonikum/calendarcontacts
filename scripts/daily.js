@@ -4,7 +4,8 @@ var format = require('string-format');
 
 model.getAllSortedEvents(true, function( err, events ) {
     var plusWeek = moment().add(8, 'd'),
-        todayStr = moment().format('DD.MM');
+        todayStr = moment().format('DD.MM'),
+        tomorrowStr = moment().add(1, 'd').format('DD.MM');
 
     events = events.filter( function(event) {
         var day = moment( event.date, 'DD.MM' );
@@ -13,11 +14,11 @@ model.getAllSortedEvents(true, function( err, events ) {
 
     var html = '<ul style="font-size:16px;">';
     events.forEach(function( e ) {
-        var red = ( todayStr === e.date ? 'color:red;' : '' ),
+        var color = ( e.date === todayStr ? 'color:red;' : ( e.date === tomorrowStr ? 'color:#ef7808;' : '' ) ),
             bold = ' style="font-weight:bold"';
         html += format(
             '<li style="line-height:25px;{0}"><span>{1} {2}</span>&nbsp;<span{3}>{4}</span>&nbsp;<span{5}>{6}</span></li>',
-            red,
+            color,
             e.date, e.dayOfWeek,
             e.isPerson ? '' : bold, e.event,
             e.isPerson ? bold : '', e.host
