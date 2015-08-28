@@ -17,7 +17,7 @@ model.getAllSortedEvents(true, function( err, events ) {
         var color = ( e.date === todayStr ? 'color:red;' : ( e.date === tomorrowStr ? 'color:#ef7808;' : '' ) ),
             bold = ' style="font-weight:bold"';
         html += format(
-            '<li style="line-height:25px;{0}"><span>{1} {2}</span>&nbsp;<span{3}>{4}</span>&nbsp;<span{5}>{6}</span></li>',
+            '<li style="line-height:30px;{0}"><span>{1} {2}</span>&nbsp;<span{3}>{4}</span>&nbsp;<span{5}>{6}</span></li>',
             color,
             e.date, e.dayOfWeek,
             e.isPerson ? '' : bold, e.event,
