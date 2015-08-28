@@ -3,7 +3,7 @@ var moment = require('moment');
 var format = require('string-format');
 
 model.getAllSortedEvents(true, function( err, events ) {
-    var plusWeek = moment().add(8, 'd'),
+    var plusWeek = moment().add(7, 'd'),
         todayStr = moment().format('DD.MM'),
         tomorrowStr = moment().add(1, 'd').format('DD.MM');
 
