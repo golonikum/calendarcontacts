@@ -34,7 +34,7 @@ model.getAllSortedEvents(true, function( err, events ) {
         subject: '🎂 Ближайшие события',
         html: html
     }, function(err, json) {
-        if (err) { return logger.crit(err); }
-        else { return logger.info('Email was successfully send.'); }
+        if (err) { return console.log(err); }
+        else { return console.log('Email was successfully send.'); }
     });
 });
