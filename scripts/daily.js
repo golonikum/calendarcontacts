@@ -26,7 +26,7 @@ model.getAllSortedEvents(true, function( err, events ) {
     });
     html += '</ul>';
 
-    var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+    var sendgrid  = require('sendgrid')(process.env.SENDGRID_API_KEY);
     sendgrid.send({
         to: 'goloniko@gmail.com',
         from: 'contacts2@golonikum.net',
