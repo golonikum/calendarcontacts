@@ -1,6 +1,7 @@
 var model = require('./../modules/model');
 var moment = require('moment');
 var format = require('string-format');
+var logger = require('./../modules/logger').logger;
 
 model.getAllSortedEvents(true, function( err, events ) {
     var plusWeek = moment().add(7, 'd'),
@@ -33,6 +34,7 @@ model.getAllSortedEvents(true, function( err, events ) {
         subject: '🎂 Ближайшие события',
         html: html
     }, function(err, json) {
-        if (err) { return console.error(err); }
+        if (err) { return logger.crit(err); }
+        else { return logger.info('Email was successfully send.'); }
     });
 });
