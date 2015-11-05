@@ -150,10 +150,22 @@ module.exports = {
                     var start = moment().format('MMDD');
                     end = moment().add(2, 'M').format('MMDD');
 
-                    all = all.filter(function(event){
-                        var date = getComparableDate( event );
-                        return ( start <= date && date < end );
-                    });
+	                if ( start >= '1101' ) {
+		                var firstPart = all.filter(function(event){
+			                var date = getComparableDate( event );
+			                return ( start <= date );
+		                });
+		                var secondPart = all.filter(function(event){
+			                var date = getComparableDate( event );
+			                return ( date < end );
+		                });
+		                all = firstPart.concat( secondPart );
+	                } else {
+		                all = all.filter(function(event){
+			                var date = getComparableDate( event );
+			                return ( start <= date && date < end );
+		                });
+	                }
                 }
 
                 cb(null, all);
