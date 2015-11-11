@@ -34,10 +34,6 @@ li.today {
     color: red;
 }
 
-.panel-body {
-	padding: 0 15px;
-}
-
 .panel-body p {
-	padding: 15px 0;
+	margin: 15px 0;
 }
