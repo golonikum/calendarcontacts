@@ -31,9 +31,17 @@ div.address-block {
 }
 
 a i.fa {
-    margin-right: 5px;
+    margin-right: 8px;
 }
 
 li.today {
     color: red;
+}
+
+.panel-body p {
+	margin: 5px 0 20px;
+}
+
+.panel-body p:last-child {
+	margin: 0 0 5px;
 }
