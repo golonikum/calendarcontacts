@@ -175,10 +175,16 @@ module.exports = {
 			                var date = getComparableDate( event );
 			                return ( start <= date );
 		                });
+                        firstPart.forEach(function( event ){
+                            event.year = moment().format('YYYY');
+                        });
 		                var secondPart = all.filter(function(event){
 			                var date = getComparableDate( event );
 			                return ( date < end );
 		                });
+                        secondPart.forEach(function( event ){
+                            event.year = moment().add(1, 'Y').format('YYYY');
+                        });
 		                all = firstPart.concat( secondPart );
 	                } else {
 		                all = all.filter(function(event){

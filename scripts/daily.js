@@ -9,7 +9,8 @@ model.getAllSortedEvents(true, function( err, events ) {
         tomorrowStr = moment().add(1, 'd').format('DD.MM');
 
     events = events.filter( function(event) {
-        var day = moment( event.date, 'DD.MM' );
+        var year = '.' + ( event.year || moment().format('YYYY') ),
+            day = moment( event.date + year, 'DD.MM.YYYY' );
         return day.isBefore( plusWeek );
     } );
 
