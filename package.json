@@ -20,9 +20,12 @@
     "express-winston": "0.3.x",
     "jade": "1.9.x",
     "js-beautify": "1.5.x",
+    "mime": "1.3.x",
     "moment": "2.10.x",
     "multer": "0.1.x",
     "pg": "4.3.x",
+    "sendgrid": "1.9.x",
+    "sparkpost": "x",
     "string": "3.1.x",
     "string-format": "0.5.x",
     "winston": "1.0.x"
