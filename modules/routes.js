@@ -2,18 +2,7 @@ var moment = require('moment');
 var beautify = require('js-beautify').js_beautify;
 var auth = require('./auth');
 var model = require('./model');
-var logger = require('./logger').logger;
-
-function errorWrapper(res, cb) {
-    return function(err, arg) {
-        if ( err ) {
-            logger.fatal(err);
-            res.status(500).end();
-        } else {
-            cb.call(this, arg);
-        }
-    };
-}
+var logErrorWrapper = require('./logger').errorWrapper;
 
 module.exports = {
     init: function(app) {
@@ -26,13 +15,13 @@ module.exports = {
         });
 
         app.get('/nearest', auth.restrict, function(req, res) {
-            model.getAllSortedEvents(true, errorWrapper(res, function(events) {
+            model.getAllSortedEvents(true, logErrorWrapper(res, function(events) {
                 res.render('events', {title: 'Ближайшие события: ' + moment().format('DD.MM.YYYY'), events: events});
             }));
         });
 
         app.get('/all', auth.restrict, function(req, res){
-            model.getAllSortedEvents(false, errorWrapper(res, function(events) {
+            model.getAllSortedEvents(false, logErrorWrapper(res, function(events) {
                 res.render('events', {title: 'Все события', events: events});
             }));
         });
@@ -42,7 +31,7 @@ module.exports = {
         });
 
         app.post('/load', auth.restrict, function(req, res){
-            model.uploadPesronsFile(req.files.persons.path, errorWrapper(res, function() {
+            model.uploadPesronsFile(req.files.persons.path, logErrorWrapper(res, function() {
                 res.redirect('/main');
             }));
         });
@@ -52,7 +41,7 @@ module.exports = {
         });
 
         app.post('/search', auth.restrict, function(req, res){
-            model.findPersons(req.body.fio, errorWrapper(res, function(persons) {
+            model.findPersons(req.body.fio, logErrorWrapper(res, function(persons) {
                 res.render('search', {title: 'Информация о людях (найдено ' + persons.length + ')', persons: persons, fio: req.body.fio});
             }));
         });
@@ -60,7 +49,7 @@ module.exports = {
         app.get('/person', auth.restrict, function(req, res){
             var id = req.query.id;
             if ( id ) {
-                model.getPerson(id, errorWrapper(res, function(person){
+                model.getPerson(id, logErrorWrapper(res, function(person){
                     var obj = {
                             title: 'Информация о человеке'
                         };
@@ -82,7 +71,7 @@ module.exports = {
             if ( !id ) {
                 id = Date.now();
             }
-            model.updatePerson(id, req.body, errorWrapper(res, function(){
+            model.updatePerson(id, req.body, logErrorWrapper(res, function(){
                 res.redirect('/person?id=' + id);
             }));
         });
@@ -90,14 +79,14 @@ module.exports = {
         app.get('/remove-person', auth.restrict, function(req, res){
             var id = req.query.id;
             if ( id ) {
-                model.removePerson(id, errorWrapper(res, function(){
+                model.removePerson(id, logErrorWrapper(res, function(){
                     res.redirect('/main');
                 }));
             }
         });
 
         app.get('/download', auth.restrict, function(req, res){
-            model.getAllPersons(errorWrapper(res, function(persons){
+            model.getAllPersons(logErrorWrapper(res, function(persons){
                 res.setHeader('Content-disposition', 'attachment; filename=persons.' + moment().format('YYYY-MM-DD-HHmmss') + '.json');
                 res.setHeader('Content-type', 'application/json');
                 res.end( beautify(JSON.stringify(persons)) );

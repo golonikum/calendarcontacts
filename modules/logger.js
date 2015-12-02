@@ -7,7 +7,6 @@ var customColors = {
     debug: 'green',
     info: 'green',
     warn: 'yellow',
-    crit: 'red',
     fatal: 'red'
 };
  
@@ -18,8 +17,7 @@ var logger = new(winston.Logger)({
         debug: 1,
         info: 2,
         warn: 3,
-        crit: 4,
-        fatal: 5
+        fatal: 4
     },
     transports: [
         new(winston.transports.Console)({
@@ -36,8 +34,8 @@ winston.addColors(customColors);
 // Extend logger object to properly log 'Error' types
 var origLog = logger.log;
  
-logger.log = function (level, msg) {
-    if (msg instanceof Error) {
+logger.log = function ( level, msg ) {
+    if ( msg instanceof Error ) {
         var args = Array.prototype.slice.call(arguments);
         args[1] = msg.stack;
         origLog.apply(logger, args);
@@ -46,26 +44,34 @@ logger.log = function (level, msg) {
     }
 };
 
-/* LOGGER EXAMPLES
-    logger.trace('testing');
-*/
- 
+logger.displayError = function( err, res ) {
+    res.status( 500 ).send( 'HTTP 500 Error. See logs.' ).end();
+    logger.fatal( err );
+};
+
 module.exports = {
-    logger: logger,
+    commonLogger: logger,
     requestLogger: expressWinston.logger({
         transports: [
             new winston.transports.Console({
-                json: true,
-                colorize: true
+                json: false,
+                colorize: true,
+                timestamp: true
             })
         ]
     }),
-    errorLogger: expressWinston.errorLogger({
-        transports: [
-            new winston.transports.Console({
-                json: true,
-                colorize: true
-            })
-        ]
-    })
+    errorWrapper: function (res, cb) {
+        return function(err, arg) {
+            try {
+                cb.call(this, arg);
+            }
+            catch ( err ) {
+                logger.displayError( err, res );
+            }
+        };
+    },
+    errorLogger: function(err, req, res, next) {
+        if( !err ) return next();
+        logger.displayError( err, res );
+    }
 };
