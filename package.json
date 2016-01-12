@@ -24,7 +24,7 @@
     "multer": "0.1.x",
     "pg": "4.3.x",
     "sendgrid": "1.9.x",
-    "sparkpost": "x",
+    "sparkpost": "1.1.x",
     "string": "3.1.x",
     "string-format": "0.5.x",
     "winston": "1.0.x"
