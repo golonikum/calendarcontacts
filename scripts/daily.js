@@ -31,7 +31,6 @@ model.getAllSortedEvents(true, function( err, events ) {
         html += '</ul>';
 
 	    emailer.send({
-		    subject: '🎂 Ближайшие события',
 		    html: html
 	    });
     } else {
