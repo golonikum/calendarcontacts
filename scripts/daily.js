@@ -2,6 +2,7 @@ var model = require('./../modules/model');
 var moment = require('moment');
 var format = require('string-format');
 var logger = require('./../modules/logger').logger;
+var emailer = require('./../modules/emailer');
 
 model.getAllSortedEvents(true, function( err, events ) {
     var plusWeek = moment().add(7, 'd'),
@@ -29,16 +30,10 @@ model.getAllSortedEvents(true, function( err, events ) {
         });
         html += '</ul>';
 
-        var sendgrid  = require('sendgrid')(process.env.SENDGRID_API_KEY);
-        sendgrid.send({
-            to: 'goloniko@gmail.com',
-            from: 'contacts2@golonikum.net',
-            subject: '🎂 Ближайшие события',
-            html: html
-        }, function(err, json) {
-            if (err) { return console.log(err); }
-            else { return console.log('Email was successfully sent.'); }
-        });
+	    emailer.send({
+		    subject: '🎂 Ближайшие события',
+		    html: html
+	    });
     } else {
         console.log('There is nothing to send.');
     }

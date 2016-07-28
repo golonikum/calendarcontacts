@@ -3,6 +3,8 @@ var beautify = require('js-beautify').js_beautify;
 var auth = require('./auth');
 var model = require('./model');
 var logErrorWrapper = require('./logger').errorWrapper;
+var emailer = require('./emailer');
+var postgres = require('./postgres');
 
 module.exports = {
     init: function(app) {
@@ -74,21 +76,13 @@ module.exports = {
             model.updatePerson(id, req.body, logErrorWrapper(res, function(){
                 // send a email and redirect
 		        postgres.getPersonsJson(function(err, persons) {
-		            if (err) {
-		                cb(err);
-        		    } else {
-        		        var sendgrid  = require('sendgrid')(process.env.SENDGRID_API_KEY);
-		        		sendgrid.send({
-		        		    to: 'goloniko@gmail.com',
-				            from: 'contacts2@golonikum.net',
-				            subject: '🎂 Contacts and Events Backup',
-				            html: '',
+		            if (!err) {
+			            emailer.send({
+				            subject: '? ?Backup',
 				            files: [{filename: 'persons.js', content: persons}]
-		        		}, function(err, json) {
-				            if (err) { return console.log(err); }
-				            else { return console.log('Email was successfully sent.'); }
-							res.redirect('/person?id=' + id);
-				        });
+			            }, function(){
+				            res.redirect('/person?id=' + id);
+			            });
             		}
         		});
                 
