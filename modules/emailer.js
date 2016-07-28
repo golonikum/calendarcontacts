@@ -6,7 +6,7 @@ module.exports = {
 			to: 'goloniko@gmail.com',
 			from: 'contacts2@golonikum.net',
 			subject: cfg.subject || '🎂 Ближайшие события',
-			html: cfg.html,
+			html: cfg.html || 'Авторассылка',
 			files: cfg.files || undefined
 		}, function(err, json) {
 			if (err) {
