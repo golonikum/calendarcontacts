@@ -73,6 +73,25 @@ module.exports = {
             }
             model.updatePerson(id, req.body, logErrorWrapper(res, function(){
                 res.redirect('/person?id=' + id);
+                // send a email
+		        postgres.getPersonsJson(function(err, persons) {
+		            if (err) {
+		                cb(err);
+        		    } else {
+        		        var sendgrid  = require('sendgrid')(process.env.SENDGRID_API_KEY);
+		        		sendgrid.send({
+		        		    to: 'goloniko@gmail.com',
+				            from: 'contacts2@golonikum.net',
+				            subject: '🎂 Contacts and Events Backup',
+				            html: '',
+				            files: [{filename: 'persons.js', content: persons}]
+		        		}, function(err, json) {
+				            if (err) { return console.log(err); }
+				            else { return console.log('Email was successfully sent.'); }
+				        });
+            		}
+        		});
+                
             }));
         });
 
