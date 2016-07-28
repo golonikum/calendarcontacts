@@ -72,8 +72,7 @@ module.exports = {
                 id = Date.now();
             }
             model.updatePerson(id, req.body, logErrorWrapper(res, function(){
-                res.redirect('/person?id=' + id);
-                // send a email
+                // send a email and redirect
 		        postgres.getPersonsJson(function(err, persons) {
 		            if (err) {
 		                cb(err);
@@ -88,6 +87,7 @@ module.exports = {
 		        		}, function(err, json) {
 				            if (err) { return console.log(err); }
 				            else { return console.log('Email was successfully sent.'); }
+							res.redirect('/person?id=' + id);
 				        });
             		}
         		});
