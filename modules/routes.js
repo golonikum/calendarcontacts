@@ -78,7 +78,7 @@ module.exports = {
 		        postgres.getPersonsJson(function(err, persons) {
 		            if (!err) {
 			            emailer.send({
-				            subject: '? Backup',
+				            subject: 'Backup',
 				            files: [{filename: 'persons.js', content: JSON.stringify(persons)}]
 			            }, function(){
 				            res.redirect('/person?id=' + id);
