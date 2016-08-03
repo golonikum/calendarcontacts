@@ -53,6 +53,7 @@ block content
         if error
             p(class="text-danger") #{error}
         else
+            +success-alert(person['message'])
             form(class="form-horizontal", method="POST", action="/person#{id ? '?id='+id : ''}", role="form", id="person-form")
                 h3 Основное
                 +field('lastname', 'Фамилия', person && person['фио'] && person['фио']['фамилия'])

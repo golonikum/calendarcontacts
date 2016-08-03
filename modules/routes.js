@@ -58,6 +58,7 @@ module.exports = {
                     if (person) {
                         obj.person = person;
                         obj.id = id;
+                        obj.message = req.query.message || undefined;
                     } else {
                         obj.error = 'Ошибка';
                     }
@@ -79,9 +80,9 @@ module.exports = {
 		            if (!err) {
 			            emailer.send({
 				            subject: '🎂 Backup',
-				            files: [{filename: 'persons.js', content: JSON.stringify(persons)}]
+				            files: [{filename: 'persons.' + moment().format('YYYY-MM-DD-HHmmss') + '.json', content: JSON.stringify(persons)}]
 			            }, function(){
-				            res.redirect('/person?id=' + id);
+				            res.redirect('/person?id=' + id + '&message=Successful');
 			            });
             		}
         		});
