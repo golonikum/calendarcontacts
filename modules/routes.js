@@ -78,7 +78,7 @@ module.exports = {
                 // send a email and redirect
                 emailer.sendBackupPersons(
                     {
-                        html: 'Обновление информации о человеке.'
+                        html: (req.query.id ? 'Обновление' : 'Добавление') + ' информации о человеке.'
                     },
                     function(){
                         res.redirect('/person?id=' + id + '&message=Information was successfully saved.');
