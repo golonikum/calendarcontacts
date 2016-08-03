@@ -13,7 +13,7 @@ module.exports = {
         });
 
         app.get('/main', auth.restrict, function(req, res){
-            res.render('main', {title: 'Главная'});
+            res.render('main', {title: 'Главная', message: req.query.message || undefined});
         });
 
         app.get('/nearest', auth.restrict, function(req, res) {
