@@ -76,17 +76,14 @@ module.exports = {
             }
             model.updatePerson(id, req.body, logErrorWrapper(res, function(){
                 // send a email and redirect
-		        postgres.getPersonsJson(function(err, persons) {
-		            if (!err) {
-			            emailer.send({
-				            subject: '🎂 Backup',
-				            files: [{filename: 'persons.' + moment().format('YYYY-MM-DD-HHmmss') + '.json', content: JSON.stringify(persons)}]
-			            }, function(){
-				            res.redirect('/person?id=' + id + '&message=Information was successfully saved.');
-			            });
-            		}
-        		});
-                
+                emailer.sendBackupPersons(
+                    {
+                        html: 'Обновление информации о человеке.'
+                    },
+                    function(){
+                        res.redirect('/person?id=' + id + '&message=Information was successfully saved.');
+                    }
+                );
             }));
         });
 
@@ -94,7 +91,15 @@ module.exports = {
             var id = req.query.id;
             if ( id ) {
                 model.removePerson(id, logErrorWrapper(res, function(){
-                    res.redirect('/main');
+                    // send a email and redirect
+                    emailer.sendBackupPersons(
+                        {
+                            html: 'Удаление информации о человеке.'
+                        },
+                        function(){
+                            res.redirect('/main?message=Information about person was successfully removed.');
+                        }
+                    );
                 }));
             }
         });
