@@ -7,9 +7,9 @@ mixin item(href, icon, title, blank)
             | #{title}
 
 block content
-    if message
-        +success-alert(message)
     div(class='panel-body')
+        if message
+            +success-alert(message)
         +item('all', 'list', 'Все события')
         +item('nearest', 'calendar', 'Ближайшие события')
         +item('search', 'search', 'Информация о людях')
