@@ -82,7 +82,7 @@ module.exports = {
 				            subject: '🎂 Backup',
 				            files: [{filename: 'persons.' + moment().format('YYYY-MM-DD-HHmmss') + '.json', content: JSON.stringify(persons)}]
 			            }, function(){
-				            res.redirect('/person?id=' + id + '&message=Successful');
+				            res.redirect('/person?id=' + id + '&message=Информация была успешно сохранена.');
 			            });
             		}
         		});
