@@ -29,6 +29,7 @@ model.getAllSortedEvents(true, function( err, events ) {
             );
         });
         html += '</ul>';
+        html += '<a href="http://contacts2.golonikum.net/" target="_blank">contacts2.golonikum.net</a>';
 
 	    emailer.send({
 		    html: html
