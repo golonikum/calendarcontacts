@@ -45,3 +45,9 @@ li.today {
 .panel-body p:last-child {
 	margin: 0 0 5px;
 }
+
+.panel-footer-top {
+	padding: 10px 15px;
+	background-color: #f5f5f5;
+	border-bottom: 1px solid #ddd;
+}
