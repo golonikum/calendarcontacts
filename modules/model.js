@@ -18,9 +18,12 @@ function getAge( date ) {
     if (date.length < 10) {
         return '';
     } else {
-        var curYear = (new Date()).getFullYear(),
+        var curDate = new Date(),
+        	curMonth = curDate.getMonth() + 1,
+        	curYear = curDate.getFullYear(),
             year = date.substr(6, 4),
-            age = curYear - year;
+            month = date.substr(3, 2),
+            age = curYear - year + (curMonth > month ? 1 : 0);
         if ( age === 0 ) {
             return '';
         } else {
