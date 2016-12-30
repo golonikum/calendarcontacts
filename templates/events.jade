@@ -2,7 +2,7 @@ extends ./base_other.jade
 
 mixin dayOfWeek(dayOfWeek, events)
     if events.nearest
-    	| #{dayOfWeek}
+        | #{dayOfWeek}
 
 block content
     ul(class="list-group")
@@ -10,15 +10,15 @@ block content
             if val.isPerson
                 li(class="list-group-item#{val.today ? ' today' : ''}", data-id="#{val.id}")
                     span(class="typo monospace") 
-                    	#{val.date} 
-                    	+dayOfWeek(val.dayOfWeek, events)
+                        #{val.date} 
+                        +dayOfWeek(val.dayOfWeek, events)
                     span(class="typo") #{val.event}
                     span(class="typo")
                         a(href="/person?id=#{val.id}") #{val.host}
             else
                 li(class="list-group-item society#{val.today ? ' today' : ''}", style="background-color:#{val.color || 'white'}")
                     span(class="typo monospace") 
-                    	#{val.date} 
-                    	+dayOfWeek(val.dayOfWeek, events)
+                        #{val.date} 
+                        +dayOfWeek(val.dayOfWeek, events)
                     b(class="typo") #{val.event}
                     span(class="typo") #{val.host}
