@@ -10,7 +10,7 @@ block content
             if val.isPerson
                 li(class="list-group-item#{val.today ? ' today' : ''}", data-id="#{val.id}")
                     span(class="typo monospace") 
-                        #{val.date} 
+                        | #{val.date} 
                         +dayOfWeek(val.dayOfWeek, events)
                     span(class="typo") #{val.event}
                     span(class="typo")
@@ -18,7 +18,7 @@ block content
             else
                 li(class="list-group-item society#{val.today ? ' today' : ''}", style="background-color:#{val.color || 'white'}")
                     span(class="typo monospace") 
-                        #{val.date} 
+                        | #{val.date} 
                         +dayOfWeek(val.dayOfWeek, events)
                     b(class="typo") #{val.event}
                     span(class="typo") #{val.host}
