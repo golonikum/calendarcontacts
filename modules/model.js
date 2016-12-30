@@ -54,7 +54,7 @@ function getRussianAge( age ) {
 }
 
 function getDayOfWeek( strDate ) {
-    return moment( strDate.substr(0, 5) + '.' + (new Date()).getFullYear(), 'DD.MM.YYYY' ).weekday();
+    return moment( strDate.substr(0, 5) + '.' + (new Date()).getFullYear(), 'DD.MM.YYYY' ).day();
 }
 
 function getRussianDayOfWeek( strDate ) {
