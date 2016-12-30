@@ -18,12 +18,14 @@ module.exports = {
 
         app.get('/nearest', auth.restrict, function(req, res) {
             model.getAllSortedEvents(true, logErrorWrapper(res, function(events) {
+	            events.nearest = true;
                 res.render('events', {title: 'Ближайшие события: ' + moment().format('DD.MM.YYYY'), events: events});
             }));
         });
 
         app.get('/all', auth.restrict, function(req, res){
             model.getAllSortedEvents(false, logErrorWrapper(res, function(events) {
+            	events.nearest = false;
                 res.render('events', {title: 'Все события', events: events});
             }));
         });
