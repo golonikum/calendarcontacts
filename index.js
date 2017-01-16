@@ -7,11 +7,13 @@ var routes = require('./modules/routes');
 var logger = require('./modules/logger');
 var app = express();
 var port = Number(process.env.PORT || 3001);
+var lessMiddleware = require('less-middleware');
 
 // config templates and static files
 app.set('view engine', 'jade');
 app.set('views', path.join(__dirname, 'templates'));
-app.use( express.static( path.join(__dirname, 'public') ) );
+app.use(lessMiddleware( path.join(__dirname, 'public') ));
+app.use(express.static( path.join(__dirname, 'public') ));
 
 // some middleware
 app.use(bodyParser.urlencoded({ extended: false }));
