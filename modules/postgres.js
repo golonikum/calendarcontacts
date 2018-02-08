@@ -1,6 +1,6 @@
 var pg = require('pg');
 var connectionString = process.env.PRODUCTION
-    ? 'postgres://pdspldcntxttnp:dMcgXepP3ToNhf7K-AuwvA_Md-@ec2-50-19-233-111.compute-1.amazonaws.com:5432/de9sjuieikqj6k'
+    ? 'postgres://jiqmocvmurstnq:b6fa0edef72a97318ef8679792321d517e58f59022302ca38e4441120a2a7716@ec2-23-23-93-115.compute-1.amazonaws.com:5432/d72q1tcdv56r4i'
     : 'postgres://postgres:12qw34er56ty@localhost:5432/postgres';
 
 function createClient() {
