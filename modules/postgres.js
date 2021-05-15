@@ -11,6 +11,7 @@ function createTableIf(cb) {
     var client = createClient();
     client.connect(function (err) {
         if (err) {
+            console.log(err);
             cb(err);
         }
         client.query('SELECT * FROM files', function (err, result) {
