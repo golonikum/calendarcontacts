@@ -4,7 +4,7 @@ var connectionString = process.env.PRODUCTION
     : 'postgres://postgres:12qw34er56ty@localhost:5432/postgres';
 
 function createClient() {
-    return new pg.Client({ connectionString: process.env.DATABASE_URL, ssl: true });
+    return new pg.Client({connectionString, ssl: true});
 }
 
 function createTableIf(cb) {
