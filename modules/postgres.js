@@ -9,27 +9,34 @@ function createClient() {
 
 function createTableIf(cb) {
     var client = createClient();
-    client.connect(function(err) {
+    client.connect(function (err) {
         if (err) {
             cb(err);
         }
-        client.query('SELECT * FROM files', function(err, result) {
+        client.query('SELECT * FROM files', function (err, result) {
             if (err) {
-                client.query('CREATE TABLE files(id SERIAL PRIMARY KEY, body VARCHAR(10000000))', function(err, result) {
-                    if (err) {
-                        client.end();
-                        cb(err);
-                    } else {
-                        client.query('INSERT INTO files(body) VALUES($1)', ['{}'], function(err, result) {
-                            if (err) {
-                                client.end();
-                                cb(err);
-                            } else {
-                                cb();
-                            }
-                        });
+                client.query(
+                    'CREATE TABLE files(id SERIAL PRIMARY KEY, body VARCHAR(10000000))',
+                    function (err, result) {
+                        if (err) {
+                            client.end();
+                            cb(err);
+                        } else {
+                            client.query(
+                                'INSERT INTO files(body) VALUES($1)',
+                                ['{}'],
+                                function (err, result) {
+                                    if (err) {
+                                        client.end();
+                                        cb(err);
+                                    } else {
+                                        cb();
+                                    }
+                                }
+                            );
+                        }
                     }
-                });
+                );
             } else {
                 client.end();
                 cb();
@@ -38,9 +45,9 @@ function createTableIf(cb) {
     });
 }
 
-function select( sql, pars, cb ) {
+function select(sql, pars, cb) {
     var client = createClient();
-    var fn = function(err, result) {
+    var fn = function (err, result) {
         if (err) {
             cb(err);
         } else {
@@ -48,7 +55,7 @@ function select( sql, pars, cb ) {
             cb(null, result);
         }
     };
-    client.connect(function(err) {
+    client.connect(function (err) {
         if (err) {
             cb(err);
         }
@@ -56,8 +63,8 @@ function select( sql, pars, cb ) {
     });
 }
 
-function wrap( cb ) {
-    createTableIf(function(err){
+function wrap(cb) {
+    createTableIf(function (err) {
         if (err) {
             cb(err);
         } else {
@@ -67,26 +74,34 @@ function wrap( cb ) {
 }
 
 module.exports = {
-    getPersonsJson: function( cb ) {
-        wrap(function(err) {
-            select( 'SELECT * FROM files', null, function(err, result) {
-                if (err) {
-                    cb(err);
-                } else {
-                    cb(null, JSON.parse(result.rows[0].body));
-                }
-            } );
+    getPersonsJson: function (cb) {
+        wrap(function (err) {
+            if (err) {
+                cb(err);
+            } else {
+                select('SELECT * FROM files', null, function (err, result) {
+                    if (err) {
+                        cb(err);
+                    } else {
+                        cb(null, JSON.parse(result.rows[0].body));
+                    }
+                });
+            }
         });
     },
-    setPersons: function( strPersons, cb ) {
-        wrap(function(err){
-            select( 'UPDATE files SET body = ($1)', [strPersons], function(err, result) {
-                if (err) {
-                    cb(err);
-                } else {
-                    cb();
-                }
-            } );
+    setPersons: function (strPersons, cb) {
+        wrap(function (err) {
+            if (err) {
+                cb(err);
+            } else {
+                select('UPDATE files SET body = ($1)', [strPersons], function (err, result) {
+                    if (err) {
+                        cb(err);
+                    } else {
+                        cb();
+                    }
+                });
+            }
         });
-    }
+    },
 };
