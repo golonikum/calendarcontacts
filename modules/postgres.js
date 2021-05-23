@@ -4,45 +4,40 @@ var connectionString = process.env.PRODUCTION
     : 'postgres://postgres:12qw34er56ty@localhost:5432/postgres';
 
 function createClient() {
-    return new pg.Client(connectionString);
+    return new pg.Client({ connectionString });
 }
 
 function createTableIf(cb) {
     var client = createClient();
-    client.connect(function (err) {
+    client.connect();
+    client.query('SELECT * FROM files', function (err, result) {
         if (err) {
-            console.log(err);
-            cb(err);
-        }
-        client.query('SELECT * FROM files', function (err, result) {
-            if (err) {
-                client.query(
-                    'CREATE TABLE files(id SERIAL PRIMARY KEY, body VARCHAR(10000000))',
-                    function (err, result) {
-                        if (err) {
-                            client.end();
-                            cb(err);
-                        } else {
-                            client.query(
-                                'INSERT INTO files(body) VALUES($1)',
-                                ['{}'],
-                                function (err, result) {
-                                    if (err) {
-                                        client.end();
-                                        cb(err);
-                                    } else {
-                                        cb();
-                                    }
+            client.query(
+                'CREATE TABLE files(id SERIAL PRIMARY KEY, body VARCHAR(10000000))',
+                function (err, result) {
+                    if (err) {
+                        client.end();
+                        cb(err);
+                    } else {
+                        client.query(
+                            'INSERT INTO files(body) VALUES($1)',
+                            ['{}'],
+                            function (err, result) {
+                                if (err) {
+                                    client.end();
+                                    cb(err);
+                                } else {
+                                    cb();
                                 }
-                            );
-                        }
+                            }
+                        );
                     }
-                );
-            } else {
-                client.end();
-                cb();
-            }
-        });
+                }
+            );
+        } else {
+            client.end();
+            cb();
+        }
     });
 }
 
