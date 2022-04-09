@@ -21,7 +21,7 @@
     "js-beautify": "1.5.x",
     "less-middleware": "^2.2.0",
     "mime": "1.4.1",
-    "moment": "2.19.3",
+    "moment": "2.29.2",
     "multer": "0.1.x",
     "pg": "8.6.0",
     "sendgrid": "1.9.x",
